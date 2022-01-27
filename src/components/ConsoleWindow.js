@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Prompt from './Prompt';
 import ConsoleMessage from './ConsoleMessage';
+import parseInput from '../utils/parseInput';
 import '../css/style.css';
 
 const WindowTitle = ({ children }) => {
@@ -10,14 +11,6 @@ const WindowTitle = ({ children }) => {
       <button className="window-button">X</button>
     </div>
   );
-};
-
-const parseInput = (inputText) => {
-  if (inputText === 'help') {
-    return 'The following commands are available: help';
-  } else {
-    return inputText + ': command not found';
-  }
 };
 
 const promptTitle = 'visitor@zmdesigns ~ >';
