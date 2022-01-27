@@ -1,14 +1,14 @@
 import ConsoleMsg from './ConsoleMessage';
 
-const PromptCursor = () => {
-  return <div className="console-cursor">&#9646;</div>;
+const PromptCursor = ({ isFocused }) => {
+  return <div className={`${isFocused ? 'console-cursor' : ''}`}>&#9646;</div>;
 };
 
-const Prompt = ({ promptTitle, promptInput }) => {
+const Prompt = ({ promptTitle, promptInput, isFocused }) => {
   return (
     <div className="prompt">
-      <div>{promptTitle + ' ' + promptInput}</div>
-      <PromptCursor />
+      {promptTitle + ' ' + promptInput}
+      <PromptCursor isFocused={isFocused} />
     </div>
   );
 };

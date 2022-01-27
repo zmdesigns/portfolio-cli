@@ -15,6 +15,8 @@ const WindowTitle = ({ children }) => {
 const parseInput = (inputText) => {
   if (inputText === 'help') {
     return 'The following commands are available: help';
+  } else {
+    return inputText + ': command not found';
   }
 };
 
@@ -53,14 +55,16 @@ const ConsoleWindow = () => {
       onBlur={handleBlur}
     >
       <WindowTitle>Command Line</WindowTitle>
-      {history.map((historyItem) => {
-        return <ConsoleMessage>{historyItem}</ConsoleMessage>;
-      })}
-      <Prompt
-        promptTitle={promptTitle}
-        promptInput={promptInput}
-        isFocused={isFocused}
-      />
+      <div className="console-body">
+        {history.map((historyItem) => {
+          return <ConsoleMessage>{historyItem}</ConsoleMessage>;
+        })}
+        <Prompt
+          promptTitle={promptTitle}
+          promptInput={promptInput}
+          isFocused={isFocused}
+        />
+      </div>
     </div>
   );
 };
