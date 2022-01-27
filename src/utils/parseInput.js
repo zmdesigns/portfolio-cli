@@ -3,7 +3,7 @@ class mockOS {
     this.cwd = '/';
   }
   tokenizer = (inputText) => {
-    return inputText.split(/\W+/);
+    return inputText.split(' ');
   };
 
   parseInput = (inputText) => {
@@ -31,6 +31,8 @@ class mockOS {
       case 'cd':
         result = this.parseCommandCd(args);
         break;
+      case 'pwd':
+        result = this.parseCommandPwd(args);
       default:
         break;
     }
@@ -45,7 +47,7 @@ class mockOS {
           return 'Lists available commands. Provides information about a command given as an argument.';
       }
     }
-    return 'Available commands are: help';
+    return 'Available commands are: help, ls, cd, pwd';
   };
 
   parseCommandCd = (args) => {
@@ -53,6 +55,7 @@ class mockOS {
       const target = args[0];
       switch (target) {
         case '/':
+        case '..':
           this.cwd = '/';
           break;
         case '/Home':
@@ -89,6 +92,10 @@ class mockOS {
     }
 
     return '';
+  };
+
+  parseCommandPwd = (args) => {
+    return this.cwd;
   };
 }
 
