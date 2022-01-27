@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Prompt from './Prompt';
 import ConsoleMessage from './ConsoleMessage';
-import parseInput from '../utils/parseInput';
+import mockOS from '../utils/parseInput';
 import '../css/style.css';
 
 const WindowTitle = ({ children }) => {
@@ -19,17 +19,25 @@ const ConsoleWindow = () => {
   const [history, setHistory] = useState([]);
   const [promptInput, setPromptInput] = useState('');
   const [isFocused, setFocus] = useState(false);
+  const [os, resetOs] = useState(new mockOS());
   const onPromptInput = (e) => {
+    e.preventDefault();
     if (e.code === 'Enter') {
       onPromptSubmit();
     } else if (e.code === 'Backspace') {
       setPromptInput(promptInput.slice(0, -1));
+    } else if (e.shiftKey) {
+      if (e.key === 'Shift') {
+        console.log('shift');
+      } else {
+        setPromptInput(promptInput + e.key);
+      }
     } else {
       setPromptInput(promptInput + e.key);
     }
   };
   const onPromptSubmit = () => {
-    const result = parseInput(promptInput);
+    const result = os.parseInput(promptInput);
     setHistory([...history, promptTitle + ' ' + promptInput, result]);
     setPromptInput('');
   };
