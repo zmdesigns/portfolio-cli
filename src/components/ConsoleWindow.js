@@ -14,10 +14,10 @@ const WindowTitle = ({ children }) => {
 };
 
 const ConsoleWindow = () => {
-  const [history, setHistory] = useState([]);
+  const [os, resetOs] = useState(new mockOS());
+  const [history, setHistory] = useState([os.welcomeMessage]);
   const [promptInput, setPromptInput] = useState('');
   const [isFocused, setFocus] = useState(false);
-  const [os, resetOs] = useState(new mockOS());
   const onPromptInput = (e) => {
     e.preventDefault();
     if (e.code === 'Enter') {

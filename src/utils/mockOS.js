@@ -12,6 +12,7 @@ class mockOS {
   initFiles() {
     this.files.insert('~', 'README.txt', { type: 'file' });
     this.files.insert('~', 'Software', { type: 'folder' });
+    this.files.insert('Software', 'Projects', { type: 'folder' });
     this.files.insert('~', 'About', { type: 'folder' });
     this.files.insert('~', 'Contact', { type: 'folder' });
   }
@@ -20,13 +21,17 @@ class mockOS {
     return inputText.split(' ');
   };
 
-  getCurrentPath() {
+  get currentPath() {
     let nodeKeys = this.cwd.map((dir) => dir.key);
     return nodeKeys.join('/');
   }
 
+  get welcomeMessage() {
+    return 'Welcome to MockOS';
+  }
+
   get promptText() {
-    return this.user + '@' + this.host + ' ' + this.getCurrentPath() + '>';
+    return this.user + '@' + this.host + ' ' + this.currentPath + '>';
   }
 
   parseInput = (inputText) => {
@@ -62,6 +67,30 @@ class mockOS {
     return result;
   };
 
+  pathNodeListFromString = (pathString) => {
+    let pathNodeList = [];
+    const pathStringList = pathString.split('/');
+    const startDir = pathStringList[0];
+    let currentNode = this.files.root;
+    if (startDir !== this.files.root.key) {
+      //start from relative dir
+      currentNode = this.cwd[this.cwd.length - 1];
+    }
+    pathStringList.forEach((pathKey) => {
+      //only search immediate children
+      let pathNode = currentNode.children.find(
+        (child) => child.key === pathKey
+      );
+      if (pathNode) {
+        pathNodeList.push(pathNode);
+        currentNode = pathNode;
+      } else {
+        return undefined;
+      }
+    });
+    return pathNodeList;
+  };
+
   parseCommandHelp = (args) => {
     if (args) {
       const arg = args[0];
@@ -85,23 +114,19 @@ class mockOS {
 
   parseCommandCd = (args) => {
     if (args) {
-      const target = args[0];
-      if (target == '/') {
-        this.cwd = [this.files.root];
-        return '';
-      } else if (target == '..') {
+      const targetString = args[0];
+      if (targetString === '..') {
         if (this.cwd.length > 1) {
           this.cwd.pop();
         }
       } else {
-        const currentNode = this.cwd[this.cwd.length - 1];
-        const targetNode = this.files.find(target, currentNode);
-        if (targetNode !== undefined) {
-          this.cwd.push(targetNode);
-          return '';
+        const targetPath = this.pathNodeListFromString(targetString);
+        if (targetPath !== undefined && targetPath.length > 0) {
+          this.cwd = targetPath;
+        } else {
+          return 'cd: ' + targetString + ' directory not found';
         }
       }
-      return 'cd: ' + target + ' directory not found';
     }
     return '';
   };
@@ -121,7 +146,7 @@ class mockOS {
   };
 
   parseCommandPwd = (args) => {
-    return this.cwd.join('/');
+    return this.currentPath;
   };
 }
 
