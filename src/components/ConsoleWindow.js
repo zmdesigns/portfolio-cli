@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Prompt from './Prompt';
 import ConsoleMessage from './ConsoleMessage';
-import mockOS from '../utils/parseInput';
+import mockOS from '../utils/mockOS';
 import '../css/style.css';
 
 const WindowTitle = ({ children }) => {
@@ -12,8 +12,6 @@ const WindowTitle = ({ children }) => {
     </div>
   );
 };
-
-const promptTitle = 'visitor@zmdesigns ~ >';
 
 const ConsoleWindow = () => {
   const [history, setHistory] = useState([]);
@@ -28,7 +26,7 @@ const ConsoleWindow = () => {
       setPromptInput(promptInput.slice(0, -1));
     } else if (e.shiftKey) {
       if (e.key === 'Shift') {
-        console.log('shift');
+        //don't print 'Shift'
       } else {
         setPromptInput(promptInput + e.key);
       }
@@ -37,8 +35,9 @@ const ConsoleWindow = () => {
     }
   };
   const onPromptSubmit = () => {
+    const beforePromptText = os.promptText;
     const result = os.parseInput(promptInput);
-    setHistory([...history, promptTitle + ' ' + promptInput, result]);
+    setHistory([...history, beforePromptText + ' ' + promptInput, result]);
     setPromptInput('');
   };
   const handleFocus = () => {
@@ -61,7 +60,7 @@ const ConsoleWindow = () => {
           return <ConsoleMessage>{historyItem}</ConsoleMessage>;
         })}
         <Prompt
-          promptTitle={promptTitle}
+          promptTitle={os.promptText || 'booting...'}
           promptInput={promptInput}
           isFocused={isFocused}
         />

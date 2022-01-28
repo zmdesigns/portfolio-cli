@@ -1,10 +1,29 @@
+import Tree from './tree';
+
 class mockOS {
   constructor() {
     this.cwd = '/';
+    this.user = 'visitor';
+    this.host = 'zmdesigns';
+    this.files = new Tree('/', { type: 'folder' });
+    this.initFiles();
   }
+
+  initFiles() {
+    this.files.insert('/', 'Home', { type: 'folder' });
+    this.files.insert('Home', 'README.txt', { type: 'file' });
+    this.files.insert('/', 'Software', { type: 'folder' });
+    this.files.insert('/', 'About', { type: 'folder' });
+    this.files.insert('/', 'Contact', { type: 'folder' });
+  }
+
   tokenizer = (inputText) => {
     return inputText.split(' ');
   };
+
+  get promptText() {
+    return this.user + '@' + this.host + ' ' + this.cwd + '>';
+  }
 
   parseInput = (inputText) => {
     const tokens = this.tokenizer(inputText);
@@ -50,47 +69,40 @@ class mockOS {
     return 'Available commands are: help, ls, cd, pwd';
   };
 
+  //if first character is '/' use it root node, otherwise use cwd node
+  //split argument by '/'
+  //for each token in argument
+  //  search token under parent
+  //  if found
+  //    parent = token
+  //    next token
+  //  if not found
+  //    error
+
   parseCommandCd = (args) => {
     if (args) {
       const target = args[0];
-      switch (target) {
-        case '/':
-        case '..':
-          this.cwd = '/';
-          break;
-        case '/Home':
-          this.cwd = '/Home';
-          break;
-        case '/SoftwareDev':
-          this.cwd = '/SoftwareDev';
-          break;
-        case '/About':
-          this.cwd = '/About';
-          break;
-        case '/Contact':
-          this.cwd = '/Contact';
-          break;
-        default:
-          return 'cd: ' + target + ': No such file or directory';
+      const targetNode = this.files.find(target);
+      if (targetNode) {
+        this.cwd = target;
+        return '';
       }
+      return 'cd: ' + target + ' directory not found';
     }
     return '';
   };
 
   parseCommandLs = (args) => {
-    switch (this.cwd) {
-      case '/':
-        return 'Home, SoftwareDev, About, Contact';
-      case '/Home':
-        return 'README.txt, logo.png';
-      case '/SoftwareDev':
-        return 'listProjects.sh';
-      case '/About':
-        return 'README.txt';
-      case '/Contact':
-        return 'sendmail.sh, README.txt';
-    }
+    const dirNode = args.length
+      ? this.files.find(args[0])
+      : this.files.find(this.cwd);
 
+    if (dirNode) {
+      const contents = dirNode.children.map((child) => {
+        return child.key;
+      });
+      return contents.join(',');
+    }
     return '';
   };
 
