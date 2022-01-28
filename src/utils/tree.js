@@ -51,8 +51,8 @@ class Tree {
     return false;
   }
 
-  find(key) {
-    for (let node of this.preOrderTraversal()) {
+  find(key, parentNode = this.root) {
+    for (let node of this.preOrderTraversal(parentNode)) {
       if (node.key === key) return node;
     }
     return undefined;

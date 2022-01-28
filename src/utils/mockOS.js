@@ -82,10 +82,16 @@ class mockOS {
   parseCommandCd = (args) => {
     if (args) {
       const target = args[0];
-      const targetNode = this.files.find(target);
-      if (targetNode) {
+      if (target == '/') {
         this.cwd = target;
         return '';
+      } else {
+        const currentNode = this.files.find(this.cwd);
+        const targetNode = this.files.find(target, currentNode);
+        if (targetNode !== undefined) {
+          this.cwd = target;
+          return '';
+        }
       }
       return 'cd: ' + target + ' directory not found';
     }
@@ -93,9 +99,9 @@ class mockOS {
   };
 
   parseCommandLs = (args) => {
-    const dirNode = args.length
-      ? this.files.find(args[0])
-      : this.files.find(this.cwd);
+    const currentNode = this.files.find(this.cwd);
+    const targetKey = args.length ? args[0] : this.cwd;
+    const dirNode = this.files.find(targetKey, currentNode);
 
     if (dirNode) {
       const contents = dirNode.children.map((child) => {
@@ -103,7 +109,7 @@ class mockOS {
       });
       return contents.join(',');
     }
-    return '';
+    return 'ls: ' + targetKey + ' directory not found';
   };
 
   parseCommandPwd = (args) => {
