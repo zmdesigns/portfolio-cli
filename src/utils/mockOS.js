@@ -2,27 +2,31 @@ import Tree from './tree';
 
 class mockOS {
   constructor() {
-    this.cwd = '/';
     this.user = 'visitor';
     this.host = 'zmdesigns';
-    this.files = new Tree('/', { type: 'folder' });
+    this.files = new Tree('~', { type: 'folder' });
+    this.cwd = [this.files.root];
     this.initFiles();
   }
 
   initFiles() {
-    this.files.insert('/', 'Home', { type: 'folder' });
-    this.files.insert('Home', 'README.txt', { type: 'file' });
-    this.files.insert('/', 'Software', { type: 'folder' });
-    this.files.insert('/', 'About', { type: 'folder' });
-    this.files.insert('/', 'Contact', { type: 'folder' });
+    this.files.insert('~', 'README.txt', { type: 'file' });
+    this.files.insert('~', 'Software', { type: 'folder' });
+    this.files.insert('~', 'About', { type: 'folder' });
+    this.files.insert('~', 'Contact', { type: 'folder' });
   }
 
   tokenizer = (inputText) => {
     return inputText.split(' ');
   };
 
+  getCurrentPath() {
+    let nodeKeys = this.cwd.map((dir) => dir.key);
+    return nodeKeys.join('/');
+  }
+
   get promptText() {
-    return this.user + '@' + this.host + ' ' + this.cwd + '>';
+    return this.user + '@' + this.host + ' ' + this.getCurrentPath() + '>';
   }
 
   parseInput = (inputText) => {
@@ -83,13 +87,17 @@ class mockOS {
     if (args) {
       const target = args[0];
       if (target == '/') {
-        this.cwd = target;
+        this.cwd = [this.files.root];
         return '';
+      } else if (target == '..') {
+        if (this.cwd.length > 1) {
+          this.cwd.pop();
+        }
       } else {
-        const currentNode = this.files.find(this.cwd);
+        const currentNode = this.cwd[this.cwd.length - 1];
         const targetNode = this.files.find(target, currentNode);
         if (targetNode !== undefined) {
-          this.cwd = target;
+          this.cwd.push(targetNode);
           return '';
         }
       }
@@ -99,8 +107,8 @@ class mockOS {
   };
 
   parseCommandLs = (args) => {
-    const currentNode = this.files.find(this.cwd);
-    const targetKey = args.length ? args[0] : this.cwd;
+    const currentNode = this.cwd[this.cwd.length - 1];
+    const targetKey = args.length ? args[0] : this.cwd[this.cwd.length - 1].key;
     const dirNode = this.files.find(targetKey, currentNode);
 
     if (dirNode) {
@@ -113,7 +121,7 @@ class mockOS {
   };
 
   parseCommandPwd = (args) => {
-    return this.cwd;
+    return this.cwd.join('/');
   };
 }
 
