@@ -75,8 +75,16 @@ class mockOS {
     if (startDir !== this.files.root.key) {
       //start from relative dir
       currentNode = this.cwd[this.cwd.length - 1];
+      pathNodeList = this.cwd.slice();
     }
     pathStringList.forEach((pathKey) => {
+      if (pathKey === '..') {
+        if (pathNodeList.length > 0) {
+          pathNodeList.pop();
+        } else {
+          return undefined;
+        }
+      }
       //only search immediate children
       let pathNode = currentNode.children.find(
         (child) => child.key === pathKey
@@ -115,19 +123,14 @@ class mockOS {
   parseCommandCd = (args) => {
     if (args) {
       const targetString = args[0];
-      if (targetString === '..') {
-        if (this.cwd.length > 1) {
-          this.cwd.pop();
-        }
+      const targetPath = this.pathNodeListFromString(targetString);
+      if (targetPath !== undefined && targetPath.length > 0) {
+        this.cwd = targetPath;
       } else {
-        const targetPath = this.pathNodeListFromString(targetString);
-        if (targetPath !== undefined && targetPath.length > 0) {
-          this.cwd = targetPath;
-        } else {
-          return 'cd: ' + targetString + ' directory not found';
-        }
+        return 'cd: ' + targetString + ' directory not found';
       }
     }
+
     return '';
   };
 
