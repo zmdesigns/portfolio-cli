@@ -100,7 +100,7 @@ class mockOS {
   };
 
   parseCommandHelp = (args) => {
-    if (args) {
+    if (args.length > 0) {
       const arg = args[0];
       switch (arg) {
         case 'help':
@@ -110,18 +110,8 @@ class mockOS {
     return 'Available commands are: help, ls, cd, pwd';
   };
 
-  //if first character is '/' use it root node, otherwise use cwd node
-  //split argument by '/'
-  //for each token in argument
-  //  search token under parent
-  //  if found
-  //    parent = token
-  //    next token
-  //  if not found
-  //    error
-
   parseCommandCd = (args) => {
-    if (args) {
+    if (args.length > 0) {
       const targetString = args[0];
       const targetPath = this.pathNodeListFromString(targetString);
       if (targetPath !== undefined && targetPath.length > 0) {
@@ -130,22 +120,24 @@ class mockOS {
         return 'cd: ' + targetString + ' directory not found';
       }
     }
-
     return '';
   };
 
   parseCommandLs = (args) => {
-    const currentNode = this.cwd[this.cwd.length - 1];
-    const targetKey = args.length ? args[0] : this.cwd[this.cwd.length - 1].key;
-    const dirNode = this.files.find(targetKey, currentNode);
-
-    if (dirNode) {
-      const contents = dirNode.children.map((child) => {
-        return child.key;
-      });
-      return contents.join(',');
+    let targetNode = this.cwd[this.cwd.length - 1];
+    if (args.length > 0) {
+      const targetString = args[0];
+      const targetPath = this.pathNodeListFromString(targetString);
+      if (targetPath !== undefined && targetPath.length > 0) {
+        targetNode = targetPath[targetPath.length - 1];
+      } else {
+        return 'ls: ' + targetString + ' directory not found';
+      }
     }
-    return 'ls: ' + targetKey + ' directory not found';
+    const contents = targetNode.children.map((child) => {
+      return child.key;
+    });
+    return contents.join(',');
   };
 
   parseCommandPwd = (args) => {
