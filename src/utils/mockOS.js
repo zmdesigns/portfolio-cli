@@ -81,19 +81,21 @@ class mockOS {
       if (pathKey === '..') {
         if (pathNodeList.length > 0) {
           pathNodeList.pop();
+          currentNode = pathNodeList[pathNodeList.length - 1];
         } else {
           return undefined;
         }
-      }
-      //only search immediate children
-      let pathNode = currentNode.children.find(
-        (child) => child.key === pathKey
-      );
-      if (pathNode) {
-        pathNodeList.push(pathNode);
-        currentNode = pathNode;
       } else {
-        return undefined;
+        //only search immediate children
+        let pathNode = currentNode.children.find(
+          (child) => child.key === pathKey
+        );
+        if (pathNode) {
+          pathNodeList.push(pathNode);
+          currentNode = pathNode;
+        } else {
+          return undefined;
+        }
       }
     });
     return pathNodeList;
